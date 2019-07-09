@@ -1,0 +1,20 @@
+use test;
+drop procedure if exists exportfile11 ;
+
+DELIMITER //
+CREATE PROCEDURE exportfile11(IN table_name varchar(20), IN db varchar(20), IN deli varchar(5))
+BEGIN
+
+set @tablename = table_name;
+set @database = db;
+set @term = ' FIELDS TERMINATED BY';
+set @del = deli;
+set @lterm = concat(' LINES TERMINATED BY ', "'","\\","n","'");
+set @date=DATE_FORMAT(CURDATE(),'%y_%m_%d');
+set @path:='/var/lib/mysql-files/';
+set @filename:=concat(@path ,@tablename,"_",@date);
+set @sql:=concat('select * from ' ,@database, '.', @tablename, '  into OUTFILE  "', @filename ,'.txt" '  ,@term, " " ,"'",@del,"'", 'ESCAPED BY "\"',@lterm);
+prepare statement from @sql;
+execute statement;
+END //
+DELIMITER ;
